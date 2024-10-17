@@ -47,7 +47,7 @@ func (d *Datapipe) getToken() error {
 		return err
 	}
 
-	d.Log.Info("Request: ", req)
+	d.Log.Debug("Request: ", req)
 
 	// send request
 	resp, err := httpClient.Do(req)
@@ -73,9 +73,9 @@ func (d *Datapipe) getToken() error {
 		d.Log.Error("Error reading token")
 		return err
 	}
+	d.Lock()
 	d.token = t.Token
-
-	d.Log.Info("Token: ", d.token)
+	d.Unlock()
 
 	return nil
 }

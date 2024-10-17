@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/op/go-logging"
@@ -21,6 +22,7 @@ type Datapipe struct {
 	keyPath       string
 	caPath        string
 	token         string
+	sync.Mutex
 }
 
 // Init datapipe
@@ -63,7 +65,9 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
+	d.Lock()
 	req.Header.Set("Authorization", "Bearer "+d.token)
+	d.Unlock()
 
 	// Create new Http Client
 	client := &http.Client{}
