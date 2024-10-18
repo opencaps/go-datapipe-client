@@ -29,7 +29,7 @@ type Info struct {
 
 type Fields struct {
 	RELIABILITY int     `json:"RELIABILITY,omitempty"`
-	VALUENB     float64 `json:"VALUENB"`
+	VALUENB     float64 `json:"VALUENB,omitempty"`
 	VALUESTR    string  `json:"VALUESTR,omitempty"`
 }
 
@@ -43,7 +43,7 @@ type WriteMessage struct {
 	Data []Data `json:"data,omitempty"`
 }
 
-func (d *Datapipe) WriteData(nature, entityID, factor, zoneID, itemID string, ts int64, value string) {
+func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value string) {
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		d.Log.Error("Error converting string to float64")
@@ -55,12 +55,13 @@ func (d *Datapipe) WriteData(nature, entityID, factor, zoneID, itemID string, ts
 		Group:        factor,
 		Zone:         zoneID,
 		BuildingID:   entityID,
+		ProjectID:    projectID,
 		DataSourceID: itemID,
 	}
 
 	fields := Fields{
-		RELIABILITY: 1,
 		VALUENB:     val,
+		RELIABILITY: 1,
 	}
 
 	data := Data{
@@ -80,5 +81,5 @@ func (d *Datapipe) WriteData(nature, entityID, factor, zoneID, itemID string, ts
 	}
 
 	d.Log.Debug("Writing Data: ", writeMessage)
-	d.sendRequest(jsonData)
+	d.sendRequest([]byte("[" + string(jsonData) + "]"))
 }

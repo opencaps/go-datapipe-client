@@ -57,7 +57,7 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 	// Send request to datapipe
 
 	// Create new Http Request
-	req, err := http.NewRequest("POST", d.url, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", d.url+"/data/service", bytes.NewBuffer(data))
 	if err != nil {
 		d.Log.Error("Error creating request")
 		return err
@@ -68,6 +68,8 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 	d.Lock()
 	req.Header.Set("Authorization", "Bearer "+d.token)
 	d.Unlock()
+
+	d.Log.Debug("Request: ", req)
 
 	// Create new Http Client
 	client := &http.Client{}
@@ -80,7 +82,7 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 	// Read response
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		d.Log.Error("Error getting response")
+		d.Log.Error("Error getting response", resp.Status)
 		return err
 	}
 
