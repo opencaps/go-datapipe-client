@@ -12,10 +12,11 @@ import (
 
 const (
 	tokenRenewal = 24 * time.Hour
+	logName      = "datapipe"
 )
 
 type Datapipe struct {
-	Log           *logging.Logger
+	log           *logging.Logger
 	url           string
 	tokenEndpoint string
 	certPath      string
@@ -27,15 +28,21 @@ type Datapipe struct {
 
 // Init datapipe
 func (d *Datapipe) Init(conf Conf) {
+	d.log = logging.MustGetLogger(logName)
+	logging.SetLevel(logging.INFO, logName)
 	d.url = conf.DatapipeURL
 	d.certPath = conf.DatapipeCertPath
 	d.keyPath = conf.DatapipeKeyPath
 	d.tokenEndpoint = conf.DatapipeTokenEndPoint
+	loglevel, err := logging.LogLevel(conf.LogLevel)
+	if err == nil {
+		logging.SetLevel(loglevel, logName)
+	}
 
 	// Get token
-	err := d.getToken()
+	err = d.getToken()
 	if err != nil {
-		d.Log.Fatal("Error getting token", err)
+		d.log.Fatal("Error getting token", err)
 	}
 
 	go d.updateToken()
@@ -47,7 +54,7 @@ func (d *Datapipe) updateToken() {
 	for range ticker.C {
 		err := d.getToken()
 		if err != nil {
-			d.Log.Fatal("Error getting token")
+			d.log.Fatal("Error getting token")
 		}
 	}
 }
@@ -58,7 +65,7 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 	// Create new Http Request
 	req, err := http.NewRequest("POST", d.url+"/data/service", bytes.NewBuffer(data))
 	if err != nil {
-		d.Log.Error("Error creating request")
+		d.log.Error("Error creating request")
 		return err
 	}
 
@@ -68,20 +75,20 @@ func (d *Datapipe) sendRequest(data json.RawMessage) error {
 	req.Header.Set("Authorization", "Bearer "+d.token)
 	d.Unlock()
 
-	d.Log.Debug("Request: ", req)
+	d.log.Debug("Request: ", req)
 
 	// Create new Http Client
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		d.Log.Error("Error sending request")
+		d.log.Error("Error sending request")
 		return err
 	}
 
 	// Read response
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		d.Log.Error("Error getting response", resp.Status)
+		d.log.Error("Error getting response", resp.Status)
 		return err
 	}
 

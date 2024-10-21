@@ -12,4 +12,5 @@ type Conf struct {
 	DatapipeCertPath      string
 	DatapipeKeyPath       string
 	DatapipeTokenEndPoint string
+	LogLevel              string
 }

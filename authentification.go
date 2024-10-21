@@ -9,7 +9,7 @@ import (
 func (d *Datapipe) newTLSConfig() *tls.Config {
 	cert, err := tls.LoadX509KeyPair(d.certPath, d.keyPath)
 	if err != nil {
-		d.Log.Fatal("Error loading client certificate", err)
+		d.log.Fatal("Error loading client certificate", err)
 	}
 
 	tlsConfig := &tls.Config{
@@ -32,23 +32,23 @@ func (d *Datapipe) getToken() error {
 
 	req, err := http.NewRequest("GET", d.tokenEndpoint+d.url, nil)
 	if err != nil {
-		d.Log.Error("Error creating request")
+		d.log.Error("Error creating request")
 		return err
 	}
 
-	d.Log.Debug("Request: ", req)
+	d.log.Debug("Request: ", req)
 
 	// send request
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		d.Log.Error("Error sending request")
+		d.log.Error("Error sending request")
 		return err
 	}
 
 	// read response
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		d.Log.Error("Error getting token")
+		d.log.Error("Error getting token")
 		return err
 	}
 
@@ -59,7 +59,7 @@ func (d *Datapipe) getToken() error {
 	var t token
 	err = json.NewDecoder(resp.Body).Decode(&t)
 	if err != nil {
-		d.Log.Error("Error reading token")
+		d.log.Error("Error reading token")
 		return err
 	}
 	d.Lock()

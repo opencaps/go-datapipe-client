@@ -15,6 +15,7 @@ const (
 
 	// GROUP
 	Temperature = "TMP"
+	ValveOpen   = "VALVE_OPEN"
 	State       = "C_STATE"
 )
 
@@ -46,7 +47,7 @@ type WriteMessage struct {
 func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value string) {
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		d.Log.Error("Error converting string to float64")
+		d.log.Error("Error converting string to float64")
 		return
 	}
 
@@ -76,10 +77,10 @@ func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID
 
 	jsonData, err := json.Marshal(writeMessage)
 	if err != nil {
-		d.Log.Error("Error marshalling data")
+		d.log.Error("Error marshalling data")
 		return
 	}
 
-	d.Log.Debug("Writing Data: ", writeMessage)
+	d.log.Debug("Writing Data: ", writeMessage)
 	d.sendRequest([]byte("[" + string(jsonData) + "]"))
 }
