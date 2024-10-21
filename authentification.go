@@ -2,10 +2,8 @@ package datapipe
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 func (d *Datapipe) newTLSConfig() *tls.Config {
@@ -14,16 +12,7 @@ func (d *Datapipe) newTLSConfig() *tls.Config {
 		d.Log.Fatal("Error loading client certificate", err)
 	}
 
-	caCert, err := os.ReadFile(d.caPath)
-	if err != nil {
-		d.Log.Fatal("Error loading CA certificate", err)
-	}
-
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
 	tlsConfig := &tls.Config{
-		RootCAs:      caCertPool,
 		Certificates: []tls.Certificate{cert},
 	}
 

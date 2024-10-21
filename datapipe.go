@@ -30,7 +30,6 @@ func (d *Datapipe) Init(conf Conf) {
 	d.url = conf.DatapipeURL
 	d.certPath = conf.DatapipeCertPath
 	d.keyPath = conf.DatapipeKeyPath
-	d.caPath = conf.DatapipeCAPath
 	d.tokenEndpoint = conf.DatapipeTokenEndPoint
 
 	// Get token

@@ -11,6 +11,5 @@ type Conf struct {
 	DatapipeURL           string
 	DatapipeCertPath      string
 	DatapipeKeyPath       string
-	DatapipeCAPath        string
 	DatapipeTokenEndPoint string
 }
