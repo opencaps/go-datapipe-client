@@ -5,6 +5,14 @@ import (
 	"strconv"
 )
 
+type DataType int
+
+const (
+	// DATA TYPE
+	Float64 DataType = iota
+	String  DataType = iota
+)
+
 const (
 	// NATURE
 	Sensor   = "SEN"
@@ -29,9 +37,9 @@ type Info struct {
 }
 
 type Fields struct {
-	RELIABILITY int     `json:"RELIABILITY,omitempty"`
-	VALUENB     float64 `json:"VALUENB,omitempty"`
-	VALUESTR    string  `json:"VALUESTR,omitempty"`
+	RELIABILITY int      `json:"RELIABILITY,omitempty"`
+	VALUENB     *float64 `json:"VALUENB,omitempty"`
+	VALUESTR    string   `json:"VALUESTR,omitempty"`
 }
 
 type Data struct {
@@ -44,7 +52,7 @@ type WriteMessage struct {
 	Data []Data `json:"data,omitempty"`
 }
 
-func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value string) {
+func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value string, dataType DataType) {
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		d.log.Error("Error converting string to float64")
@@ -60,9 +68,18 @@ func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID
 		DataSourceID: itemID,
 	}
 
-	fields := Fields{
-		VALUENB:     val,
-		RELIABILITY: 1,
+	var fields Fields
+
+	if dataType == Float64 {
+		fields = Fields{
+			VALUENB:     &val,
+			RELIABILITY: 1,
+		}
+	} else {
+		fields = Fields{
+			VALUESTR:    value,
+			RELIABILITY: 1,
+		}
 	}
 
 	data := Data{
