@@ -21,7 +21,7 @@ const (
 
 type Info struct {
 	Nature       string `json:"Nature"`
-	Zone         string `json:"Zone"`
+	Zone         string `json:"Zone,omitempty"`
 	Group        string `json:"Group"`
 	DataSourceID string `json:"dataSourceId,omitempty"`
 	BuildingID   string `json:"BuildingId"`
