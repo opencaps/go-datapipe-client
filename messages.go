@@ -2,15 +2,6 @@ package datapipe
 
 import (
 	"encoding/json"
-	"strconv"
-)
-
-type DataType int
-
-const (
-	// DATA TYPE
-	Float64 DataType = iota
-	String  DataType = iota
 )
 
 const (
@@ -52,12 +43,7 @@ type WriteMessage struct {
 	Data []Data `json:"data,omitempty"`
 }
 
-func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value string, dataType DataType) {
-	val, err := strconv.ParseFloat(value, 64)
-	if err != nil {
-		d.log.Error("Error converting string to float64")
-		return
-	}
+func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID string, ts int64, value interface{}, reliability int) {
 
 	info := Info{
 		Nature:       nature,
@@ -70,15 +56,17 @@ func (d *Datapipe) WriteData(nature, entityID, projectID, factor, zoneID, itemID
 
 	var fields Fields
 
-	if dataType == Float64 {
+	switch value.(type) {
+	case float64:
+		v := value.(float64)
 		fields = Fields{
-			VALUENB:     &val,
-			RELIABILITY: 1,
+			VALUENB:     &v,
+			RELIABILITY: reliability,
 		}
-	} else {
+	case string:
 		fields = Fields{
-			VALUESTR:    value,
-			RELIABILITY: 1,
+			VALUESTR:    value.(string),
+			RELIABILITY: reliability,
 		}
 	}
 
